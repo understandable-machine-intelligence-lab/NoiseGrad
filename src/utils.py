@@ -53,7 +53,7 @@ def visualize_explanations(
 
     plt.subplot(1, 4, 1)
     plt.imshow(denormalize_image(image.cpu().data).transpose(0, 1).transpose(1, 2))
-    plt.title(f"Original Input")
+    plt.title(f"Original input")
     plt.axis("off")
 
     plt.subplot(1, 4, 2)
