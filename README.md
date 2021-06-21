@@ -6,7 +6,7 @@
  
 --------------
 
-link to arxiv
+https://arxiv.org/abs/2106.10185
 
 Pytorch implementation for **"NoiseGrad: enhancing explanations by introducing stochasticity to model weights"**. The paper introduces two novel methods `NoiseGrad` and `NoiseGrad++` which both improves attribution-based explanations by introducing stochasticity to the model parameters.
 
