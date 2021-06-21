@@ -18,8 +18,13 @@ Pytorch implementation for **"NoiseGrad: enhancing explanations by introducing s
 
 To cite this paper use following Bibtex annotation:
 
-	@article{...
-	}
+	@misc{bykov2021noisegrad,
+	      title={NoiseGrad: enhancing explanations by introducing stochasticity to model weights}, 
+	      author={Kirill Bykov and Anna Hedström and Shinichi Nakajima and Marina M. -C. Höhne},
+	      year={2021},
+	      eprint={2106.10185},
+	      archivePrefix={arXiv},
+	      primaryClass={cs.LG}}
 
 ## Requirements
 
