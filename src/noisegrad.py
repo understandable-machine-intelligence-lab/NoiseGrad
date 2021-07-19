@@ -1,5 +1,6 @@
 from typing import Callable
 import torch
+from tqdm import tqdm
 
 
 class NoiseGrad:
@@ -11,6 +12,7 @@ class NoiseGrad:
         std: float = 0.2,
         n: int = 25,
         noise_type: str = "multiplicative",
+        verbose: bool = True,
     ):
         """
         Initialize the explanation-enhancing method: NoiseGrad.
@@ -23,6 +25,7 @@ class NoiseGrad:
             std (float): standard deviation of the distribution (often referred to as sigma)
             n (int): number of Monte Carlo rounds to sample models
             noise_type (str): the type of noise to add to the model parameters, either additive or multiplicative
+            verbose (bool): print the progress of explanation enchancement (default True)
         """
 
         self.std = std
@@ -31,6 +34,7 @@ class NoiseGrad:
         self.n = n
         self.weights = weights
         self.noise_type = noise_type
+        self.verbose = verbose
 
         # Creates a normal (also called Gaussian) distribution.
         self.distribution = torch.distributions.normal.Normal(
@@ -64,7 +68,7 @@ class NoiseGrad:
             (self.n, kwargs.get("img_size", 224), kwargs.get("img_size", 224))
         )
 
-        for i in range(self.n):
+        for i in (tqdm(range(self.n)) if self.verbose else range(self.n)):
             self.sample()
             explanation[i] = explanation_fn(
                 self.model.to(kwargs.get("device", None)), inputs, targets
@@ -85,6 +89,7 @@ class NoiseGradPlusPlus(NoiseGrad):
         n: int = 10,
         m: int = 10,
         noise_type: str = "multiplicative",
+        verbose: bool = True
     ):
         """
         Initialize the explanation-enhancing method: NoiseGrad++.
@@ -97,6 +102,7 @@ class NoiseGradPlusPlus(NoiseGrad):
             std (float): standard deviation of the distribution (often referred to as sigma)
             n (int): number of Monte Carlo rounds to sample models
             noise_type (str): the type of noise to add to the model parameters, either additive or multiplicative
+            verbose (bool): print the progress of explanation enchancement (default True)
 
         Args:
             model:
@@ -119,6 +125,7 @@ class NoiseGradPlusPlus(NoiseGrad):
         self.sg_mean = sg_mean
         self.weights = weights
         self.noise_type = noise_type
+        self.verbose = verbose
 
         # Creates a normal (also called Gaussian) distribution.
         self.distribution = torch.distributions.normal.Normal(
@@ -153,7 +160,7 @@ class NoiseGradPlusPlus(NoiseGrad):
             (self.n, self.m, kwargs.get("img_size", 224), kwargs.get("img_size", 224))
         )
 
-        for i in range(self.n):
+        for i in (tqdm(range(self.n)) if self.verbose else range(self.n)):
             self.sample()
             for j in range(self.m):
                 inputs_noisy = (
