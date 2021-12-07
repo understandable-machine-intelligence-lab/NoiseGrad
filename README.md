@@ -6,7 +6,7 @@
  
 --------------
 
-Pytorch implementation for **"NoiseGrad: enhancing explanations by introducing stochasticity to model weights"**. The paper introduces two novel methods `NoiseGrad` and `NoiseGrad++` which both improves attribution-based explanations by introducing stochasticity to the model parameters. See arXiv preprint: https://arxiv.org/abs/2106.10185.
+Pytorch implementation for **"NoiseGrad: enhancing explanations by introducing stochasticity to model weights"**. The paper introduces two novel methods `NoiseGrad` and `FusionGrad` which both improves attribution-based explanations by introducing stochasticity to the model parameters. See arXiv preprint: https://arxiv.org/abs/2106.10185.
 
 <p align="center">
   <img src="samples/resulting_explanation.png" alt="Visualization of baseline, NoiseGrad and NoiseGrad++ explanations using (Integrated Gradient) as XAI method." width="512"/>  
