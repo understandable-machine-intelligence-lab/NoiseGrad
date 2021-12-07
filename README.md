@@ -1,4 +1,4 @@
-<h1 align="center"><b>NoiseGrad and NoiseGrad++</b></h1>
+<h1 align="center"><b>NoiseGrad and FusdionGrad</b></h1>
 <h3 align="center"><b>NoiseGrad: enhancing explanations by introducing stochasticity to model weights</b></h3>
 <p align="center">
   <i>Pytorch implementation</i>
