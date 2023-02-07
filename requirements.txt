@@ -5,3 +5,4 @@ torchvision==0.14.1
 transformers==4.26.0
 datasets==2.9.0
 tqdm==4.64.1
+pytest==7.2.1

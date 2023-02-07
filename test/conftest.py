@@ -21,7 +21,7 @@ def text_labels():
 
 @pytest.fixture(scope="session")
 def normalised_image():
-    image = Image.open(os.path.realpath("..") + "/samples/llama.jpg")
+    image = Image.open("samples/llama.jpg")
 
     # Transform image to a 224x224 image and normalise pixel values
     nr_channels = 3

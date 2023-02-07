@@ -1,7 +1,10 @@
 """Some examples of explanation methods that can be used in NosieGrad and NoiseGrad++ implementations."""
+from __future__ import annotations
+
 import torch
-from captum.attr import *
-from utils import *
+from captum.attr import Saliency, IntegratedGradients
+from typing import Optional
+import numpy as np
 
 
 def saliency_explainer(
