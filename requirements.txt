@@ -1,5 +1,7 @@
-captum==0.3.1
-matplotlib==3.2.2
-numpy==1.19.5
-torch==1.8.1+cu101
-torchvision==0.9.1+cu101
+torch==1.13.1
+captum==0.6.0.
+matplotlib==3.6.3.
+torchvision==0.14.1
+transformers==4.26.0
+datasets==2.9.0
+tqdm==4.64.1
