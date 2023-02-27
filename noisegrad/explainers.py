@@ -39,7 +39,7 @@ def intgrad_explainer(
     targets,
     abs: bool = True,
     normalize: bool = False,
-    **kwargs
+    **kwargs,
 ) -> np.array:
     """Implementation of InteGrated Gradients by Sundararajan et al., 2017 using Captum."""
 
@@ -73,7 +73,6 @@ def explain_gradient_x_input(
     y_batch: torch.Tensor,
     attention_mask: Optional[torch.Tensor],
 ) -> torch.Tensor:
-
     logits = model(None, attention_mask, inputs_embeds=input_embeddings).logits
     indexes = torch.reshape(y_batch, (len(y_batch), 1)).to(torch.int64)
     logits_for_class = torch.gather(logits, dim=-1, index=indexes)

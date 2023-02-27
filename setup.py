@@ -7,10 +7,7 @@ setup(
     description="A explanation enhancement method.",
     long_description=open("README.md", "r").read(),
     long_description_content_type="text/markdown",
-    install_requires=[
-        "torch==1.13.1",
-        "tqdm==4.64.1"
-    ],
+    install_requires=["torch==1.13.1", "tqdm==4.64.1"],
     url="http://github.com/understandable-machine-intelligence-lab/NoiseGrad",
     author=(
         """

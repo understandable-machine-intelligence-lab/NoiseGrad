@@ -156,7 +156,6 @@ class NoiseGradPlusPlus(NoiseGrad):
         targets: torch.Tensor,
         explanation_fn: ExplanationFn,
     ) -> torch.Tensor:
-
         """
 
         Parameters
@@ -184,7 +183,6 @@ class NoiseGradPlusPlus(NoiseGrad):
         with tqdm(
             range(self._n * self._m), desc="NoiseGrad++", disable=not self._verbose_pp
         ) as pbar:
-
             for i in range(self._n):
                 self._sample(model)
                 for j in range(self._m):
