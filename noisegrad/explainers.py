@@ -5,6 +5,7 @@ import torch
 from captum.attr import Saliency, IntegratedGradients
 from typing import Optional
 import numpy as np
+from .utils import normalize_heatmap
 
 
 def saliency_explainer(
