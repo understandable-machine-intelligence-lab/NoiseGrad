@@ -75,7 +75,6 @@ def explain_gradient_x_input(
     attention_mask: Optional[torch.Tensor],
 ) -> torch.Tensor:
     logits = model(None, attention_mask, inputs_embeds=input_embeddings).logits
-    indexes = torch.reshape(y_batch, (len(y_batch), 1)).to(torch.int64)
-    logits_for_class = torch.gather(logits, dim=-1, index=indexes)
+    logits_for_class = logits[torch.range(0, logits.shape[0] - 1, dtype=torch.int64), y_batch]
     grads = torch.autograd.grad(torch.unbind(logits_for_class), input_embeddings)[0]
     return torch.sum(grads * input_embeddings, dim=-1).detach()
