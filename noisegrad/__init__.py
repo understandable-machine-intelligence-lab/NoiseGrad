@@ -1,1 +1,1 @@
-from .noisegrad import NoiseGrad, NoiseGradPlusPlus, NoiseType, ExplanationFn
+from .noisegrad import NoiseGrad, NoiseGradPlusPlus, ExplanationFn

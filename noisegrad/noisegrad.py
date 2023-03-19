@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-from typing import Callable, List
+from typing import Callable
 import torch
-from enum import Enum, auto
 from tqdm.auto import tqdm
 
 
 ExplanationFn = Callable[[torch.nn.Module, torch.Tensor, torch.Tensor], torch.Tensor]
-
-
-class NoiseType(Enum):
-    additive = auto()
-    multiplicative = auto()
 
 
 class NoiseGrad:
@@ -20,7 +14,7 @@ class NoiseGrad:
         mean: float = 1.0,
         std: float = 0.2,
         n: int = 10,
-        noise_type: NoiseType = NoiseType.multiplicative,
+        noise_type: str = "multiplicative",
         verbose: bool = True,
     ):
         """
@@ -57,18 +51,10 @@ class NoiseGrad:
         # If std is not zero, loop over each layer and add Gaussian noise.
         with torch.no_grad():
             for layer in model.parameters():
-                if self._noise_type == NoiseType.additive:
+                if self._noise_type == "additive":
                     layer.add_(self._distribution.sample(layer.size()).to(layer.device))
                 else:
                     layer.mul_(self._distribution.sample(layer.size()).to(layer.device))
-
-    @staticmethod
-    def _baseline_explanation_shape(inputs: torch.Tensor) -> List[int]:
-        return (
-            [inputs.shape[0], *inputs.shape[2:]]
-            if len(inputs.shape) == 4
-            else [inputs.shape[0], inputs.shape[1]]
-        )
 
     def enhance_explanation(
         self,
@@ -98,10 +84,11 @@ class NoiseGrad:
         """
 
         original_weights = model.state_dict()
-        explanation_shape = self._baseline_explanation_shape(inputs)
+        explanation_shape = explanation_fn(model, inputs, targets).shape
         explanation = torch.zeros((self._n, *explanation_shape))
 
-        for i in tqdm(range(self._n), desc="NoiseGrad", disable=not self._verbose):
+        it = tqdm(range(self._n), desc="NoiseGrad", disable=not self._verbose)
+        for i in it:  # noqa
             self._sample(model)
             explanation[i] = explanation_fn(model, inputs, targets)
 
@@ -118,7 +105,7 @@ class NoiseGradPlusPlus(NoiseGrad):
         sg_std: float = 0.4,
         n: int = 10,
         m: int = 10,
-        noise_type: NoiseType = NoiseType.multiplicative,
+        noise_type: str = "multiplicative",
         verbose: bool = True,
     ):
         """
@@ -176,19 +163,23 @@ class NoiseGradPlusPlus(NoiseGrad):
             Enhanced explanations.
         """
 
-        explanation_shape = self._baseline_explanation_shape(inputs)
+        explanation_shape = explanation_fn(model, inputs, targets).shape
         explanation = torch.zeros((self._m, self._n, *explanation_shape))
         original_weights = model.state_dict()
 
-        with tqdm(
+        it = tqdm(
             range(self._n * self._m), desc="NoiseGrad++", disable=not self._verbose_pp
-        ) as pbar:
+        )
+
+        with it as pbar:
             for i in range(self._n):
                 self._sample(model)
                 for j in range(self._m):
-                    inputs_noisy = (
-                        inputs + torch.randn_like(inputs) * self._sg_std + self._sg_mean
-                    )
+                    noise = torch.randn_like(inputs) * self._sg_std + self._sg_mean
+                    if self._noise_type == "additive":
+                        inputs_noisy = inputs + noise
+                    else:
+                        inputs_noisy = inputs * noise
                     explanation[i][j] = explanation_fn(model, inputs_noisy, targets)
                     pbar.update()
 

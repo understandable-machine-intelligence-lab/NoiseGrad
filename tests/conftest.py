@@ -16,7 +16,7 @@ def label():
 
 @pytest.fixture(scope="session")
 def text_labels():
-    return torch.zeros(size=(8,))
+    return torch.zeros(size=(8,), dtype=torch.int64)
 
 
 @pytest.fixture(scope="session")

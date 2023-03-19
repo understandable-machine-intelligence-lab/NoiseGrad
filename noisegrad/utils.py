@@ -10,6 +10,19 @@ import logging
 log = logging.getLogger(__name__)
 
 
+def apply_noise(
+    arr: torch.Tensor, noise: torch.Tensor, noise_type: str
+) -> torch.Tensor:
+    if noise_type not in ("additive", "multiplicative"):
+        raise ValueError(
+            f"Unsupported noise_type, supported are: additive, multiplicative."
+        )
+    if noise_type == "additive":
+        return arr + noise
+    if noise_type == "multiplicative":
+        return arr * noise
+
+
 def normalize_heatmap(heatmap: np.array) -> np.ndarray:
     """Normalise relevance given a relevance matrix (r) [-1, 1]."""
     if heatmap.min() >= 0.0:
