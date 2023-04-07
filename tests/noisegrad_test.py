@@ -5,9 +5,9 @@ from noisegrad.noisegrad import NoiseGrad, NoiseGradPlusPlus
 
 
 def test_noise_grad_image(
-    resnet18_model, normalised_image, baseline_explanation, label
+    resnet18_model, normalised_image, baseline_explanation, label, noise_grad_config
 ):
-    ng = NoiseGrad(verbose=False, n=2)
+    ng = NoiseGrad(noise_grad_config)
     result = ng.enhance_explanation(
         resnet18_model, normalised_image, label, saliency_explainer
     )
@@ -15,9 +15,9 @@ def test_noise_grad_image(
 
 
 def test_noise_grad_pp_image(
-    resnet18_model, normalised_image, baseline_explanation, label
+    resnet18_model, normalised_image, baseline_explanation, label, noise_grad_pp_config
 ):
-    ng_pp = NoiseGradPlusPlus(verbose=False, n=2, m=2)
+    ng_pp = NoiseGradPlusPlus(noise_grad_pp_config)
 
     result = ng_pp.enhance_explanation(
         resnet18_model, normalised_image, label, saliency_explainer
@@ -31,8 +31,9 @@ def test_noise_grad_text(
     attention_mask,
     baseline_explanation_text,
     text_labels,
+    noise_grad_config
 ):
-    ng = NoiseGrad(verbose=False, n=2)
+    ng = NoiseGrad(noise_grad_config)
     explain_fn = functools.partial(
         explain_gradient_x_input, attention_mask=attention_mask
     )
@@ -48,8 +49,9 @@ def test_noise_grad_pp_text(
     attention_mask,
     baseline_explanation_text,
     text_labels,
+    noise_grad_pp_config
 ):
-    ng_pp = NoiseGradPlusPlus(verbose=False, n=2, m=2)
+    ng_pp = NoiseGradPlusPlus(noise_grad_pp_config)
     explain_fn = functools.partial(
         explain_gradient_x_input, attention_mask=attention_mask
     )

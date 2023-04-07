@@ -1,50 +1,97 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import Protocol, Literal, NamedTuple, Optional
 import torch
 from tqdm.auto import tqdm
+import torch.nn as nn
 
 
-ExplanationFn = Callable[[torch.nn.Module, torch.Tensor, torch.Tensor], torch.Tensor]
+NoiseType = Literal["multiplicative", "additive"]
+
+
+class ExplanationFn(Protocol):
+    def __call__(
+        self, model: nn.Module, x_batch: torch.Tensor, y_batch: torch.Tensor
+    ) -> torch.Tensor:
+        ...
+
+
+class NoiseGradConfig(NamedTuple):
+    """
+    mean:
+        Mean of normal distribution, from which noise added to weights is sampled.
+    std:
+        Standard deviation normal distribution, from which noise added to weights is sampled.
+    n:
+        Number of types noise for weights is sampled.
+    noise_type:
+        Noise type, either multiplicative or additive, default=multiplicative.
+    verbose:
+            Indicates whether progress bar should be displayed, default=True.
+    """
+
+    mean: float = 1.0
+    std: float = 0.2
+    n: int = 10
+    noise_type: NoiseType = "multiplicative"
+    verbose: bool = True
+
+
+class NoiseGradPlusPlusConfig(NamedTuple):
+    """
+    mean:
+        Mean of normal distribution, from which noise added to weights is sampled.
+    std:
+        Standard deviation normal distribution, from which noise added to weights is sampled.
+    sg_mean:
+        Mean of normal distribution, from which noise added to inputs is sampled.
+    sg_std:
+        Standard deviation normal distribution, from which noise added to inputs is sampled.
+    n:
+        Number of types noise for weights is sampled.
+    m:
+        Number of types noise for inputs is sampled.
+    noise_type:
+        Noise type, either multiplicative or additive, default=multiplicative.
+    verbose:
+        Indicates whether progress bar should be displayed, default=True.
+    """
+
+    mean: float = 1.0
+    std: float = 0.2
+    sg_mean: float = 0.0
+    sg_std: float = 0.4
+    n: int = 10
+    m: int = 10
+    noise_type: NoiseType = "multiplicative"
+    verbose: bool = True
 
 
 class NoiseGrad:
-    def __init__(
-        self,
-        mean: float = 1.0,
-        std: float = 0.2,
-        n: int = 10,
-        noise_type: str = "multiplicative",
-        verbose: bool = True,
-    ):
+    def __init__(self, config: Optional[NoiseGradConfig] = None):
         """
-
         Parameters
         ----------
-        mean:
-            Mean of normal distribution, from which noise added to weights is sampled.
-        std:
-            Standard deviation normal distribution, from which noise added to weights is sampled.
-        n:
-            Number of types noise for weights is sampled.
-        noise_type:
-            Noise type, either multiplicative or additive, default=multiplicative.
-        verbose:
-            Indicates whether progress bar should be displayed, default=True.
+        config: Optional[NoiseGradConfig].
+            Named tuple, as defined by NoiseGradConfig, if None, will use default values.
+
         """
 
-        self._std = std
-        self._mean = mean
-        self._n = n
-        self._noise_type = noise_type
-        self._verbose = verbose
+        if config is None:
+            config = NoiseGradConfig()
+
+        self._std = config.std
+        self._mean = config.mean
+        self._n = config.n
+        self._noise_type = config.noise_type
+        self._verbose = config.verbose
 
         # Creates a normal (also called Gaussian) distribution.
         self._distribution = torch.distributions.normal.Normal(
             loc=self._mean, scale=self._std
         )
 
-    def _sample(self, model: torch.nn.Module):
+    def _sample(self, model: nn.Module):
         if self._std == 0.0:
             return
 
@@ -58,7 +105,7 @@ class NoiseGrad:
 
     def enhance_explanation(
         self,
-        model: torch.nn.Module,
+        model: nn.Module,
         inputs: torch.Tensor,
         targets: torch.Tensor,
         explanation_fn: ExplanationFn,
@@ -97,48 +144,27 @@ class NoiseGrad:
 
 
 class NoiseGradPlusPlus(NoiseGrad):
-    def __init__(
-        self,
-        mean: float = 1.0,
-        std: float = 0.2,
-        sg_mean: float = 0.0,
-        sg_std: float = 0.4,
-        n: int = 10,
-        m: int = 10,
-        noise_type: str = "multiplicative",
-        verbose: bool = True,
-    ):
-        """
+    def __init__(self, config: NoiseGradPlusPlusConfig):
+        if config is None:
+            config = NoiseGradPlusPlusConfig()
 
-        Parameters
-        ----------
-        mean:
-            Mean of normal distribution, from which noise added to weights is sampled.
-        std:
-            Standard deviation normal distribution, from which noise added to weights is sampled.
-        sg_mean:
-            Mean of normal distribution, from which noise added to inputs is sampled.
-        sg_std:
-            Standard deviation normal distribution, from which noise added to inputs is sampled.
-        n:
-            Number of types noise for weights is sampled.
-        m:
-            Number of types noise for inputs is sampled.
-        noise_type:
-            Noise type, either multiplicative or additive, default=multiplicative.
-        verbose:
-            Indicates whether progress bar should be displayed, default=True.
-        """
-
-        super().__init__(mean, std, n, noise_type, False)
-        self._m = m
-        self._sg_std = sg_std
-        self._sg_mean = sg_mean
-        self._verbose_pp = verbose
+        super().__init__(
+            NoiseGradConfig(
+                n=config.n,
+                mean=config.mean,
+                std=config.std,
+                verbose=False,
+                noise_type=config.noise_type,
+            )
+        )
+        self._m = config.m
+        self._sg_std = config.sg_std
+        self._sg_mean = config.sg_mean
+        self._verbose_pp = config.verbose
 
     def enhance_explanation(
         self,
-        model: torch.nn.Module,
+        model: nn.Module,
         inputs: torch.Tensor,
         targets: torch.Tensor,
         explanation_fn: ExplanationFn,

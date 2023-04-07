@@ -1,9 +1,7 @@
 from __future__ import annotations
-
 import numpy as np
 import torch
-import matplotlib
-import matplotlib.pyplot as plt
+from importlib import util
 
 import logging
 
@@ -59,32 +57,36 @@ def denormalize_image(
     return image
 
 
-def visualize_explanations(
-    image: np.ndarray,
-    expl_base: np.ndarray,
-    expl_ng: np.ndarray,
-    expl_ngp: np.ndarray,
-    cmap: matplotlib.colors.ListedColormap = "gist_gray",
-):
-    # Plot!
-    plt.figure(figsize=(14, 7))
+if util.find_spec("matplotlib"):
+    import matplotlib
+    import matplotlib.pyplot as plt
 
-    plt.subplot(1, 4, 1)
-    plt.imshow(denormalize_image(image.cpu().data).transpose(0, 1).transpose(1, 2))
-    plt.title(f"Original input")
-    plt.axis("off")
+    def visualize_explanations(
+        image: np.ndarray,
+        expl_base: np.ndarray,
+        expl_ng: np.ndarray,
+        expl_ngp: np.ndarray,
+        cmap: matplotlib.colors.ListedColormap = "gist_gray",
+    ):
+        # Plot!
+        plt.figure(figsize=(14, 7))
 
-    plt.subplot(1, 4, 2)
-    plt.imshow(expl_base, cmap=cmap)
-    plt.title(f"Base explanation")
-    plt.axis("off")
+        plt.subplot(1, 4, 1)
+        plt.imshow(denormalize_image(image.cpu().data).transpose(0, 1).transpose(1, 2))
+        plt.title(f"Original input")
+        plt.axis("off")
 
-    plt.subplot(1, 4, 3)
-    plt.imshow(expl_ng, cmap=cmap)
-    plt.title(f"NoiseGrad explanation")
-    plt.axis("off")
+        plt.subplot(1, 4, 2)
+        plt.imshow(expl_base, cmap=cmap)
+        plt.title(f"Base explanation")
+        plt.axis("off")
 
-    plt.subplot(1, 4, 4)
-    plt.imshow(expl_ngp, cmap=cmap)
-    plt.title(f"NoiseGrad++ explanation")
-    plt.axis("off")
+        plt.subplot(1, 4, 3)
+        plt.imshow(expl_ng, cmap=cmap)
+        plt.title(f"NoiseGrad explanation")
+        plt.axis("off")
+
+        plt.subplot(1, 4, 4)
+        plt.imshow(expl_ngp, cmap=cmap)
+        plt.title(f"NoiseGrad++ explanation")
+        plt.axis("off")

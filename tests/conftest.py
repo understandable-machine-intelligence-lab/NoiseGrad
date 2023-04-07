@@ -1,10 +1,11 @@
 import pytest
 from PIL import Image
-import os
 import torchvision
 from torchvision import transforms
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from datasets import load_dataset
+
+import noisegrad.noisegrad
 from noisegrad.explainers import saliency_explainer, explain_gradient_x_input
 import torch
 
@@ -42,7 +43,9 @@ def normalised_image():
 
 @pytest.fixture(scope="session")
 def resnet18_model():
-    return torchvision.models.resnet18(pretrained=True)
+    return torchvision.models.resnet18(
+        weights=torchvision.models.resnet.ResNet18_Weights.IMAGENET1K_V1
+    )
 
 
 @pytest.fixture(scope="session")
@@ -100,3 +103,13 @@ def baseline_explanation_text(
     return explain_gradient_x_input(
         distilbert_model, input_embeddings, text_labels, attention_mask
     )
+
+
+@pytest.fixture(scope="session")
+def noise_grad_config():
+    return noisegrad.noisegrad.NoiseGradConfig(n=2, verbose=False)
+
+
+@pytest.fixture(scope="session")
+def noise_grad_pp_config():
+    return noisegrad.noisegrad.NoiseGradPlusPlusConfig(n=2, m=2, verbose=False)
