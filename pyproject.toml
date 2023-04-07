@@ -111,7 +111,6 @@ dependencies = [
 # projects.
 [project.optional-dependencies] # Optional
 examples = [
-    "torch>=1.13.1",
     "captum>=0.6.0",
     "matplotlib",
     "torchvision==0.14.1",
