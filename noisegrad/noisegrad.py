@@ -130,7 +130,7 @@ class NoiseGrad:
             Enhanced explanations.
         """
 
-        original_weights = model.state_dict()
+        original_weights = model.state_dict().copy()
         explanation_shape = explanation_fn(model, inputs, targets).shape
         explanation = torch.zeros((self._n, *explanation_shape))
 
@@ -144,19 +144,21 @@ class NoiseGrad:
 
 
 class NoiseGradPlusPlus(NoiseGrad):
-    def __init__(self, config: NoiseGradPlusPlusConfig):
-        if config is None:
-            config = NoiseGradPlusPlusConfig()
-
-        super().__init__(
-            NoiseGradConfig(
+    def __init__(self, config: Optional[NoiseGradPlusPlusConfig] = None):
+        if config is not None:
+            ng_config = NoiseGradConfig(
                 n=config.n,
                 mean=config.mean,
                 std=config.std,
                 verbose=False,
                 noise_type=config.noise_type,
             )
-        )
+
+        else:
+            config = NoiseGradPlusPlusConfig()
+            ng_config = NoiseGradConfig(verbose=False)
+
+        super().__init__(ng_config)
         self._m = config.m
         self._sg_std = config.sg_std
         self._sg_mean = config.sg_mean
@@ -191,7 +193,7 @@ class NoiseGradPlusPlus(NoiseGrad):
 
         explanation_shape = explanation_fn(model, inputs, targets).shape
         explanation = torch.zeros((self._m, self._n, *explanation_shape))
-        original_weights = model.state_dict()
+        original_weights = model.state_dict().copy()
 
         it = tqdm(
             range(self._n * self._m), desc="NoiseGrad++", disable=not self._verbose_pp

@@ -1,1 +1,6 @@
-from .noisegrad import NoiseGrad, NoiseGradPlusPlus, ExplanationFn
+from noisegrad.noisegrad import (
+    NoiseGrad,
+    NoiseGradConfig,
+    NoiseGradPlusPlusConfig,
+    NoiseGradPlusPlus,
+)

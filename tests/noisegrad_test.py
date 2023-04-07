@@ -31,7 +31,7 @@ def test_noise_grad_text(
     attention_mask,
     baseline_explanation_text,
     text_labels,
-    noise_grad_config
+    noise_grad_config,
 ):
     ng = NoiseGrad(noise_grad_config)
     explain_fn = functools.partial(
@@ -49,7 +49,7 @@ def test_noise_grad_pp_text(
     attention_mask,
     baseline_explanation_text,
     text_labels,
-    noise_grad_pp_config
+    noise_grad_pp_config,
 ):
     ng_pp = NoiseGradPlusPlus(noise_grad_pp_config)
     explain_fn = functools.partial(
