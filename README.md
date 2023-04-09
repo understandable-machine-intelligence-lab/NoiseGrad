@@ -24,9 +24,7 @@ To cite this paper use following Bibtex annotation:
 
 ## Installation
 
-To install requirements:
-
-```setup
+```shell
 pip install noisegrad
 ```
 
