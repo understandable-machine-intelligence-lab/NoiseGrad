@@ -8,9 +8,7 @@
 
 Pytorch implementation for **"NoiseGrad: enhancing explanations by introducing stochasticity to model weights"**. The paper introduces two novel methods `NoiseGrad` and `FusionGrad` which both improves attribution-based explanations by introducing stochasticity to the model parameters. See arXiv preprint: https://arxiv.org/abs/2106.10185.
 
-<p align="center">
-  <img src="samples/resulting_explanation.png" alt="Visualization of baseline, NoiseGrad and NoiseGrad++ explanations using (Integrated Gradient) as XAI method." width="512"/>
-</p>
+![](https://raw.githubusercontent.com/understandable-machine-intelligence-lab/NoiseGrad/master/samples/resulting_explanation.png)
 
 ## Cite this paper
 
@@ -24,17 +22,35 @@ To cite this paper use following Bibtex annotation:
 	      archivePrefix={arXiv},
 	      primaryClass={cs.LG}}
 
-## Requirements
+## Installation
 
 To install requirements:
 
 ```setup
-pip install -r requirements.txt
+pip install noisegrad
 ```
 
 All experiments were conducted with Python 3.6.9.
 
-## Code structure
+## Minimal Example, for more detailed ones, please refer to `examples/`
+```python
+from noisegrad import NoiseGrad, NoiseGradConfig, NoiseGradPlusPlus, NoiseGradPlusPlusConfig
+from noisegrad.explainers import intgrad_explainer
 
-The source code can be found in the `src/` folder and an example notebook in `examples/` folder.
+# Initialize NoiseGrad: enhance any explanation function!
+noisegrad = NoiseGrad(NoiseGradConfig(n=5))
+
+# Initialize NoiseGrad++: enhance any explanation function!
+noisegradp = NoiseGradPlusPlus(NoiseGradPlusPlusConfig(n=5, m=5))
+
+# Get baseline explanation.
+expl_base = intgrad_explainer(model, x, y)
+
+# Get NoiseGrad explanation.
+expl_ng = noisegrad.enhance_explanation(model, x, y, intgrad_explainer)
+
+# Get NoiseGrad++ explanation.
+expl_ngp = noisegradp.enhance_explanation(model, x, y, intgrad_explainer)
+```
+
 

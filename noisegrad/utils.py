@@ -1,24 +1,26 @@
 from __future__ import annotations
-import numpy as np
-import torch
-from importlib import util
 
 import logging
+from importlib import util
+
+import numpy as np
+import torch
+
+from noisegrad.noisegrad import NoiseType
 
 log = logging.getLogger(__name__)
 
 
 def apply_noise(
-    arr: torch.Tensor, noise: torch.Tensor, noise_type: str
+    arr: torch.Tensor, noise: torch.Tensor, noise_type: NoiseType
 ) -> torch.Tensor:
-    if noise_type not in ("additive", "multiplicative"):
-        raise ValueError(
-            f"Unsupported noise_type, supported are: additive, multiplicative."
-        )
     if noise_type == "additive":
         return arr + noise
     if noise_type == "multiplicative":
         return arr * noise
+    raise ValueError(
+        f"Unsupported noise_type, supported are: additive, multiplicative."
+    )
 
 
 def normalize_heatmap(heatmap: np.array) -> np.ndarray:

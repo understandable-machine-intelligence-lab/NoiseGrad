@@ -1,6 +1,6 @@
 import functools
 
-from noisegrad.explainers import saliency_explainer, explain_gradient_x_input
+from noisegrad.explainers import explain_gradient_x_input, saliency_explainer
 from noisegrad.noisegrad import NoiseGrad, NoiseGradPlusPlus
 
 

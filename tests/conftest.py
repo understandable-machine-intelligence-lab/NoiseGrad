@@ -1,13 +1,13 @@
 import pytest
-from PIL import Image
+import torch
 import torchvision
+from datasets import load_dataset
+from PIL import Image
 from torchvision import transforms
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-from datasets import load_dataset
 
 import noisegrad.noisegrad
-from noisegrad.explainers import saliency_explainer, explain_gradient_x_input
-import torch
+from noisegrad.explainers import explain_gradient_x_input, saliency_explainer
 
 
 @pytest.fixture(scope="session")

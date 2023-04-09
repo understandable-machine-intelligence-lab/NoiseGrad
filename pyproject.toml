@@ -83,11 +83,13 @@ classifiers = [# Optional
     #   5 - Production/Stable
     "Development Status :: 3 - Alpha",
     # Indicate who your project is intended for
+    "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
     # Pick your license as you wish
-    "License :: GNU LESSER GENERAL PUBLIC LICENSE VERSION 3",
-    "Topic :: Scientific :: Explainable Artificial Intelligence",
-    "Topic :: Scientific :: XAI",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
 # This field lists other packages that your project depends on to run.
@@ -98,6 +100,7 @@ classifiers = [# Optional
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [
     "torch>=1.13.1",
+    "numpy",
     "tqdm",
 ]
 
@@ -121,6 +124,11 @@ test = [
     "noisegrad[examples]",
     "pytest"
 ]
+lint = [
+    "noisegrad[examples]",
+    "flake8",
+    "mypy"
+]
 
 # List URLs that are relevant to your project
 #
@@ -133,7 +141,7 @@ test = [
 # maintainers, and where to support the project financially. The key is
 # what's used to render the link text on PyPI.
 [project.urls]  # Optional
-"Homepage" = "http://github.com/understandable-machine-intelligence-lab/NoiseGrad"
+"Homepage" = "https://github.com/understandable-machine-intelligence-lab/NoiseGrad"
 #"Bug Reports" = "https://github.com/pypa/sampleproject/issues"
 #"Funding" = "https://donate.pypi.org"
 #"Say Thanks!" = "http://saythanks.io/to/example"
@@ -144,18 +152,14 @@ test = [
 #[project.scripts]  # Optional
 #sample = "sample:main"
 
-# This is configuration specific to the `setuptools` build backend.
-# If you are using a different build backend, you will need to change this.
-[tool.setuptools]
-# If there are data files included in your packages that need to be
-# installed, specify them here.
-#package-data = {"sample" = ["*.dat"]}
-packages = [
-    "noisegrad",
-]
-
 [build-system]
 # These are the assumed default build requirements from pip:
 # https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
-requires = ["setuptools>=43.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["flit-core >= 3.4"]
+build-backend = "flit_core.buildapi"
+
+
+[tool.mypy]
+mypy_path = "noisegrad/"
+ignore_missing_imports = true
+plugins = ["numpy.typing.mypy_plugin"]
