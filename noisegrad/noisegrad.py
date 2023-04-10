@@ -10,8 +10,15 @@ NoiseType = Literal["multiplicative", "additive"]
 
 
 class ExplanationFn(Protocol):
-
-    def __call__(self, mode: nn.Module, x_batch: torch.Tensor, y_batch: torch.Tensor, *args, **kwargs) -> torch.Tensor: ...
+    def __call__(
+        self,
+        mode: nn.Module,
+        x_batch: torch.Tensor,
+        y_batch: torch.Tensor,
+        *args,
+        **kwargs,
+    ) -> torch.Tensor:
+        ...
 
 
 class NoiseGradConfig(NamedTuple):

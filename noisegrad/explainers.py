@@ -78,18 +78,44 @@ if util.find_spec("captum"):
             .data
         )
 
+    def explain_integrated_gradients(
+        model: nn.Module,
+        input_embeddings: torch.Tensor,
+        y_batch: torch.Tensor,
+        num_steps: int = 10,
+        **kwargs,
+    ) -> torch.Tensor:
+        def predict_fn(x):
+            return model(None, inputs_embeds=x, **kwargs)
+
+        explainer = IntegratedGradients(predict_fn)
+        grads = explainer.attribute(
+            inputs=input_embeddings, n_steps=num_steps, target=y_batch
+        )
+
+        scores = torch.linalg.norm(grads, dim=-1)
+
+        return scores
+
+
+def explain_gradient_norm(
+    model: nn.Module, input_embeddings: torch.Tensor, y_batch: torch.Tensor, **kwargs
+) -> torch.Tensor:
+    logits = model(None, inputs_embeds=input_embeddings, **kwargs)
+    logits_for_class = logits_for_labels(logits, y_batch)
+    grads = torch.autograd.grad(torch.unbind(logits_for_class), input_embeddings)[0]
+    scores = torch.linalg.norm(grads, dim=-1)
+    return scores
+
 
 def explain_gradient_x_input(
-    model: nn.Module,
-    input_embeddings: torch.Tensor,
-    y_batch: torch.Tensor,
-    attention_mask: torch.Tensor | None,
+    model: nn.Module, input_embeddings: torch.Tensor, y_batch: torch.Tensor, **kwargs
 ) -> torch.Tensor:
-    logits = model(None, attention_mask, inputs_embeds=input_embeddings).logits
+    logits = model(None, **kwargs, inputs_embeds=input_embeddings).logits
     logits_for_class = logits_for_labels(logits, y_batch)
     grads = torch.autograd.grad(torch.unbind(logits_for_class), input_embeddings)[0]
     return torch.sum(grads * input_embeddings, dim=-1).detach()
 
 
 def logits_for_labels(logits: torch.Tensor, y_batch: torch.Tensor) -> torch.Tensor:
-    return logits[torch.arange(0, logits.shape[0], dtype=torch.int64), y_batch]
+    return logits[torch.arange(0, logits.shape[0], dtype=torch.int), y_batch]
