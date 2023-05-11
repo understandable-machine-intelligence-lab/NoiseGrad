@@ -7,7 +7,7 @@ from torchvision import transforms
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 import noisegrad.noisegrad
-from noisegrad.explainers import explain_gradient_x_input, saliency_explainer
+from noisegrad.explainers import text_classification, image_classification
 
 
 @pytest.fixture(scope="session")
@@ -50,7 +50,9 @@ def resnet18_model():
 
 @pytest.fixture(scope="session")
 def baseline_explanation(resnet18_model, normalised_image, label):
-    return saliency_explainer(resnet18_model, normalised_image, label)
+    return image_classification.saliency_explainer(
+        resnet18_model, normalised_image, label
+    )
 
 
 @pytest.fixture(scope="session")
@@ -100,8 +102,8 @@ def input_embeddings(distilbert_model, input_ids):
 def baseline_explanation_text(
     distilbert_model, input_embeddings, attention_mask, text_labels
 ):
-    return explain_gradient_x_input(
-        distilbert_model, input_embeddings, text_labels, attention_mask
+    return text_classification.explain_gradient_x_input(
+        distilbert_model, input_embeddings, text_labels, attention_mask=attention_mask
     )
 
 

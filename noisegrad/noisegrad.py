@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Literal, NamedTuple, Protocol
+from typing import Literal, NamedTuple, Protocol, runtime_checkable, Mapping
 
 import torch
 import torch.nn as nn
@@ -9,9 +9,10 @@ from tqdm.auto import tqdm
 NoiseType = Literal["multiplicative", "additive"]
 
 
+@runtime_checkable
 class ExplanationFn(Protocol):
+    @staticmethod
     def __call__(
-        self,
         mode: nn.Module,
         x_batch: torch.Tensor,
         y_batch: torch.Tensor,
@@ -73,7 +74,7 @@ class NoiseGradPlusPlusConfig(NamedTuple):
 
 
 class NoiseGrad:
-    def __init__(self, config: NoiseGradConfig | None = None):
+    def __init__(self, config: NoiseGradConfig | Mapping[str, ...] | None = None):
         """
         Parameters
         ----------
@@ -81,6 +82,8 @@ class NoiseGrad:
             Named tuple, as defined by NoiseGradConfig, if None, will use default values.
 
         """
+
+        config = config_from_dict(config, NoiseGradConfig)
 
         if config is None:
             config = NoiseGradConfig()
@@ -149,7 +152,10 @@ class NoiseGrad:
 
 
 class NoiseGradPlusPlus(NoiseGrad):
-    def __init__(self, config: NoiseGradPlusPlusConfig | None = None):
+    def __init__(
+        self, config: NoiseGradPlusPlusConfig | Mapping[str, ...] | None = None
+    ):
+        config = config_from_dict(config, NoiseGradPlusPlusConfig)
         if config is not None:
             ng_config = NoiseGradConfig(
                 n=config.n,
@@ -217,3 +223,15 @@ class NoiseGradPlusPlus(NoiseGrad):
 
         model.load_state_dict(original_weights)
         return explanation.mean(axis=(0, 1))
+
+
+FusionGrad = NoiseGradPlusPlus
+
+
+def config_from_dict(
+    dictionary: Mapping[str, ...], clazz
+) -> NoiseGradConfig | NoiseGradPlusPlusConfig:
+    if isinstance(dictionary, Mapping):
+        return clazz(**dictionary)
+    else:
+        return dictionary  # noqa

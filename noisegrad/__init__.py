@@ -4,3 +4,4 @@ from noisegrad.noisegrad import (
     NoiseGradPlusPlusConfig,
     NoiseGradPlusPlus,
 )
+from noisegrad.explainers import text_classification, image_classification
